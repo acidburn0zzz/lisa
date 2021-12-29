@@ -26,6 +26,7 @@ from lisa.tools import Dmesg, Echo, Git, Lspci, Make, Mount
 from lisa.util import constants, perf_timer
 from lisa.util.parallel import Task, TaskManager
 from microsoft.testsuites.dpdk.dpdktestpmd import DpdkTestpmd
+from microsoft.testsuites.dpdk.dpdkvpp import DpdkVpp
 
 VDEV_TYPE = "net_vdev_netvsc"
 MAX_RING_PING_LIMIT_NS = 200000
@@ -166,6 +167,25 @@ class Dpdk(TestSuite):
                 f"{tx_or_rx}-PPS ({pps}) should have been less "
                 "than 2^20 (~1m) PPS after sriov disable."
             ).is_less_than(2 ** 20)
+
+    @TestCaseMetadata(
+        description="""
+            build and run nff-go tests (ubuntu only)
+        """,
+        priority=2,
+        requirement=simple_requirement(
+            min_nic_count=2,
+            network_interface=Sriov(),
+        ),
+        timeout=12000,
+    )
+    def verify_dpdk_vpp(
+        self, node: Node, log: Logger, variables: Dict[str, Any]
+    ) -> None:
+
+        vpp = DpdkVpp(node)
+        vpp.install()
+        vpp.make_distro_package()
 
     def _verify_dpdk_build(
         self,

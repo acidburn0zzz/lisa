@@ -50,7 +50,7 @@ class Make(Tool):
         if thread_count == 0:
             if self._thread_count == 0:
                 lscpu = self.node.tools[Lscpu]
-                self._thread_count = lscpu.get_core_count()
+                self._thread_count = lscpu.get_core_count(force_run=True)
             thread_count = self._thread_count
 
         # yes '' answers all questions with default value.
